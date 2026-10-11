@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("./assets/fonts/Vazirmatn[wght].ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("./assets/fonts/Vazirmatn-FD-Medium.ttf") format("truetype");
+    font-weight: 100 900  ;
+    unicode-range: U+0030-0039, U+06F0-06F9;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: "Vazirmatn", sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+
+@theme {
+
+    --font-sans: "Vazirmatn", sans-serif;
+    /* سایدبار */
+    --color-brand-dark: #173B35;
+
+    /* دکمه‌های اصلی و لینک‌های مهم */
+    --color-primary: #236B5B;
+
+    /* هاور دکمه‌های سبز */
+    --color-primary-hover: #1D594D;
+
+    /* آیتم فعال منو */
+    --color-sidebar-active: #2D5B4F;
+
+    /* متن آیتم‌های غیرفعال سایدبار */
+    --color-sidebar-text: #C3D5CD;
+
+
+    /* دکمه‌های تأکیدی و اقدامات شاخص */
+    --color-accent: #E5B54B;
+
+    /* هاور دکمه‌های زرد */
+    --color-accent-hover: #D6A23B;
+
+
+    /* پس‌زمینه اصلی صفحات */
+    --color-bg: #F4F5F0;
+
+    /* پس‌زمینه کارت‌ها، پنل‌ها و جدول‌ها */
+    --color-surface: #FFFFFF;
+
+    /* پس‌زمینه فیلدها و بخش‌های فرعی */
+    --color-surface-muted: #EDF1EB;
+
+    /* حاشیه کارت‌ها، فیلدها و خطوط جداکننده */
+    --color-border: #DFE5DD;
+
+
+    /* عنوان‌ها و متن‌های اصلی */
+    --color-text: #182722;
+
+    /* توضیحات، تاریخ‌ها و متن‌های ثانویه */
+    --color-text-muted: #617068;
+
+
+    /* نشانگر وضعیت انجام‌شده */
+    --color-status-done: #1C956B;
+
+    /* متن برچسب انجام‌شده */
+    --color-status-done-text: #167651;
+
+
+    /* نشانگر وضعیت در حال انجام */
+    --color-status-progress: #3978D7;
+
+    /* متن برچسب در حال انجام */
+    --color-status-progress-text: #285BA7;
+
+
+    /* نشانگر وضعیت در انتظار شروع */
+    --color-status-todo: #D99A2B;
+
+    /* متن برچسب در انتظار شروع */
+    --color-status-todo-text: #946315;
+
+
+    /* نشانگر وضعیت عقب‌افتاده */
+    --color-status-overdue: #D94F4F;
+
+    /* متن برچسب عقب‌افتاده */
+    --color-status-overdue-text: #B82F38;
+
+
+    /* متن اولویت کم */
+    --color-priority-low: #58685F;
+
+    /* پس‌زمینه برچسب اولویت کم */
+    --color-priority-low-bg: #EDF1EE;
+
+
+    /* متن اولویت متوسط */
+    --color-priority-medium: #6251A6;
+
+    /* پس‌زمینه برچسب اولویت متوسط */
+    --color-priority-medium-bg: #F0EDFF;
+
+
+    /* متن اولویت زیاد */
+    --color-priority-high: #A65C17;
+
+    /* پس‌زمینه برچسب اولویت زیاد */
+    --color-priority-high-bg: #FFF0DC;
+}
