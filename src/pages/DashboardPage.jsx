@@ -1,40 +1,59 @@
+
+import { useState } from "react";
 import {
   AlertCircle,
-  BarChart3,
-  CalendarClock,
   CheckCircle2,
   CircleDashed,
   Clock3,
   ClipboardList,
+  Plus,
+  ListTodo,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import dashboardBanner from "../assets/images/dashboard-banner.webp";
+import StatCard from "../dashboard/StatCard";
+import TasksChart from "../dashboard/TasksChart";
+import UpcomingTasks from "../dashboard/UpcomingTasks";
+import TaskForm from "../tasks/TaskForm";
+import useTasks from "../hooks/useTasks";
+import {
+  getTaskStatistics,
+  getUpcomingTasks,
+} from "../utils/taskHelpers";
 
 const statItems = [
   {
+    key: "total",
     label: "کل وظایف",
     Icon: ClipboardList,
     iconStyle: "bg-[#EDF1EB] text-[#173B35]",
     topBorder: "border-t-[#173B35]",
   },
   {
-    label: "انجام‌شده",
+    key: "done",
+    label: "وظایف انجام‌شده",
     Icon: CheckCircle2,
     iconStyle: "bg-[#E4F5EC] text-[#167651]",
     topBorder: "border-t-[#1C956B]",
   },
   {
-    label: "در حال انجام",
+    key: "in_progress",
+    label: "وظایف در حال انجام",
     Icon: Clock3,
     iconStyle: "bg-[#EAF1FF] text-[#285BA7]",
     topBorder: "border-t-[#3978D7]",
   },
   {
-    label: "در انتظار شروع",
+    key: "todo",
+    label: "وظایف در انتظار شروع",
     Icon: CircleDashed,
     iconStyle: "bg-[#FFF3D9] text-[#946315]",
     topBorder: "border-t-[#D99A2B]",
   },
   {
-    label: "عقب‌افتاده",
+    key: "overdue",
+    label: "وظایف عقب‌افتاده",
     Icon: AlertCircle,
     iconStyle: "bg-[#FCE9E8] text-[#B82F38]",
     topBorder: "border-t-[#D94F4F]",
@@ -42,116 +61,123 @@ const statItems = [
 ];
 
 function DashboardPage() {
+  const { tasks, addTask } = useTasks();
+  const navigate = useNavigate();
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formError, setFormError] = useState("");
+
+  const statistics = getTaskStatistics(tasks);
+  const upcomingTasks = getUpcomingTasks(tasks, 5);
+
+  function handleAddTask() {
+    setFormError("");
+    setIsFormOpen(true);
+  }
+
+  function handleCloseForm() {
+    setIsFormOpen(false);
+    setFormError("");
+  }
+
+  function handleSubmitTask(taskData) {
+    const isSaved = addTask(taskData);
+
+    if (isSaved) {
+      handleCloseForm();
+    } else {
+      setFormError("ذخیره وظیفه انجام نشد. لطفاً دوباره تلاش کنید.");
+    }
+
+    return isSaved;
+  }
+
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="space-y-3"></div>
+    <div className="min-w-0 space-y-5 sm:space-y-6">
+      {/* بنر خوش‌آمدگویی */}
+      <section className="relative isolate min-w-0 overflow-hidden rounded-2xl sm:rounded-3xl">
+        <img
+          src={dashboardBanner}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-[60%_center] sm:object-center"
+        />
 
-      <section className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-primary">نمای کلی</p>
+        <div className="flex min-h-77.5 items-center p-5 sm:min-h-60 sm:p-7 md:p-8 lg:min-h-65 lg:p-10">
+          <div className="w-full text-right sm:max-w-[75%] lg:max-w-[60%]">
+            <h1 className="text-xl font-extrabold leading-9 text-brand-dark sm:text-2xl sm:leading-10 lg:text-3xl">
+              به Mini TeamFlow خوش آمدید
+            </h1>
 
-        <h1 className="text-2xl font-bold tracking-tight text-text sm:text-3xl">
-          داشبورد
-        </h1>
+            <p className="mt-2 text-sm leading-7 text-gray-600 sm:mt-3 sm:text-base sm:leading-8">
+              وظایف تیم را مدیریت کنید. پیشرفت را ببینید و باهم به هدف‌ها
+              نزدیک‌تر شوید.
+            </p>
 
-        <p className="max-w-2xl text-sm leading-7 text-text-muted sm:text-base">
-          وضعیت وظایف تیم را در یک نگاه بررسی کن.
-        </p>
-      </section>
-
-      <section aria-label="آمار وظایف">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-5">
-          {statItems.map((item) => {
-            const Icon = item.Icon;
-
-            return (
-              <article
-                key={item.label}
-                className={`min-w-0 rounded-2xl border border-border border-t-2 ${item.topBorder} bg-white p-4 shadow-sm shadow-brand-dark/3 sm:p-5`}
+            {/* دکمه‌ها */}
+            <div className="mt-5 flex w-full flex-col gap-2.5 min-[400px]:flex-row min-[400px]:flex-wrap sm:mt-6 sm:gap-3">
+              <button
+                type="button"
+                onClick={handleAddTask}
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary min-[400px]:w-auto"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-xs leading-6 text-text-muted sm:text-sm">
-                    {item.label}
-                  </p>
+                <Plus size={18} className="shrink-0" />
+                <span>ایجاد وظیفه جدید</span>
+              </button>
 
-                  <div
-                    className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${item.iconStyle}`}
-                  >
-                    <Icon size={19} strokeWidth={1.8} />
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <p className="text-right text-3xl font-bold tracking-tight text-text sm:text-4xl">
-                    —
-                  </p>
-
-                  <div className="mt-3 h-1.5 w-12 rounded-full bg-surface-muted" />
-                </div>
-              </article>
-            );
-          })}
+              <button
+                type="button"
+                onClick={() => navigate("/tasks")}
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-white/95 px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary min-[400px]:w-auto"
+              >
+                <ListTodo size={18} className="shrink-0" />
+                <span>مشاهده همه وظایف</span>
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-5 lg:gap-5">
-        <article className="min-w-0 rounded-2xl border border-border bg-white p-4 shadow-sm shadow-brand-dark/3 sm:p-6 lg:col-span-3">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#E4F0EB] text-primary">
-              <BarChart3 size={21} />
-            </div>
+      {/* مودال ایجاد وظیفه */}
+      {isFormOpen && (
+        <TaskForm
+          key="dashboard-new-task"
+          onSubmit={handleSubmitTask}
+          onCancel={handleCloseForm}
+        />
+      )}
 
-            <div>
-              <h2 className="font-bold text-text">توزیع وظایف بر اساس وضعیت</h2>
+      {formError && !isFormOpen && (
+        <p role="alert" className="text-sm text-red-600">
+          {formError}
+        </p>
+      )}
 
-              <p className="mt-1 text-xs text-text-muted">
-                نمای کلی وضعیت وظایف تیم
-              </p>
-            </div>
-          </div>
+      {/* کارت‌های آمار */}
+      <section aria-label="آمار وظایف">
+        <div className="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-5">
+          {statItems.map((item) => (
+            <StatCard
+              key={item.key}
+              label={item.label}
+              value={statistics[item.key]}
+              Icon={item.Icon}
+              iconStyle={item.iconStyle}
+              topBorder={item.topBorder}
+            />
+          ))}
+        </div>
+      </section>
 
-          <div className="mt-5 flex min-h-57.5 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-[#F9FAF7] px-4 py-8 text-center">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-[#E4F0EB] text-primary">
-              <BarChart3 size={27} strokeWidth={1.6} />
-            </div>
+      {/* وظایف و نمودارها */}
+      <section className="grid min-w-0 grid-cols-1 items-stretch gap-4 lg:grid-cols-3">
+        <div className="min-w-0 lg:col-span-1 lg:col-start-1 lg:row-start-1">
+          <UpcomingTasks tasks={upcomingTasks} />
+        </div>
 
-            <p className="mt-4 font-medium text-text">
-              جایگاه نمودار وضعیت وظایف
-            </p>
-
-            <p className="mt-2 max-w-xs text-sm leading-6 text-text-muted">
-              نمودار در مرحله‌ی بعد و پس از اتصال داده‌ها اضافه می‌شود.
-            </p>
-          </div>
-        </article>
-
-        {/* جایگاه وظایف نزدیک به موعد تحویل */}
-        <article className="min-w-0 rounded-2xl border border-border bg-white p-4 shadow-sm shadow-brand-dark/3  sm:p-6 lg:col-span-2">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF3D9] text-status-todo-text">
-              <CalendarClock size={21} />
-            </div>
-
-            <div>
-              <h2 className="font-bold text-text">وظایف نزدیک به موعد تحویل</h2>
-
-              <p className="mt-1 text-xs text-text-muted">
-                کارهایی که باید پیگیری شوند
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 flex min-h-57.5 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-[#F9FAF7] px-4 py-8 text-center">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-surface-muted text-primary">
-              <ClipboardList size={27} strokeWidth={1.6} />
-            </div>
-
-            <p className="mt-4 font-medium text-text">جایگاه فهرست وظایف</p>
-
-            <p className="mt-2 max-w-xs text-sm leading-6 text-text-muted">
-              وظایف نزدیک به موعد تحویل در این بخش نمایش داده خواهند شد.
-            </p>
-          </div>
-        </article>
+        <div className="min-w-0 lg:col-span-2 lg:col-start-2 lg:row-start-1">
+          <TasksChart statistics={statistics} tasks={tasks} />
+        </div>
       </section>
     </div>
   );

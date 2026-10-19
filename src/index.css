@@ -33,13 +33,6 @@ body {
     font-family: "Vazirmatn", sans-serif;
 }
 
-button,
-input,
-textarea,
-select {
-    font: inherit;
-}
-
 
 @theme {
 
@@ -88,24 +81,24 @@ select {
 
 
     /* نشانگر وضعیت انجام‌شده */
-    --color-status-done: #1C956B;
+    --color-status-done: #C9EBD9;
 
     /* متن برچسب انجام‌شده */
-    --color-status-done-text: #167651;
+    --color-status-done-text: #1F3E32;
 
 
     /* نشانگر وضعیت در حال انجام */
-    --color-status-progress: #3978D7;
+    --color-status-progress: #CEE0FC;
 
     /* متن برچسب در حال انجام */
-    --color-status-progress-text: #285BA7;
+    --color-status-progress-text: #173A9A;
 
 
     /* نشانگر وضعیت در انتظار شروع */
-    --color-status-todo: #D99A2B;
+    --color-status-todo: #F9E8AC;
 
     /* متن برچسب در انتظار شروع */
-    --color-status-todo-text: #946315;
+    --color-status-todo-text: #59451B;
 
 
     /* نشانگر وضعیت عقب‌افتاده */
@@ -116,22 +109,22 @@ select {
 
 
     /* متن اولویت کم */
-    --color-priority-low: #58685F;
+    --color-priority-low: #34443C;
 
     /* پس‌زمینه برچسب اولویت کم */
-    --color-priority-low-bg: #EDF1EE;
+    --color-priority-low-bg: #DDE8DF;
 
 
     /* متن اولویت متوسط */
-    --color-priority-medium: #6251A6;
+    --color-priority-medium: #4338A4;
 
     /* پس‌زمینه برچسب اولویت متوسط */
-    --color-priority-medium-bg: #F0EDFF;
+    --color-priority-medium-bg: #E1D7F6;
 
 
     /* متن اولویت زیاد */
-    --color-priority-high: #A65C17;
+    --color-priority-high: #B42318;
 
     /* پس‌زمینه برچسب اولویت زیاد */
-    --color-priority-high-bg: #FFF0DC;
+    --color-priority-high-bg: #FCDEC5;
 }
