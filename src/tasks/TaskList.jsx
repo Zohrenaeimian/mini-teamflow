@@ -16,6 +16,7 @@ const columns = [
 function TaskList({
   tasks = [],
   totalCount = 0,
+  pageSize = 8,
   filters = {},
   currentPage = 1,
   totalPages = 1,
@@ -24,7 +25,7 @@ function TaskList({
   onDelete,
   onStatusChange,
 }) {
-  const showPagination = totalCount > 8;
+  const showPagination = totalCount > pageSize;
   const hasFilters = hasActiveFilters(filters);
 
   return (

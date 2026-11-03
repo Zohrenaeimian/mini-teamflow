@@ -1,10 +1,7 @@
 import { Search, ChevronDown, RotateCcw, FunnelPlus } from "lucide-react";
 import AssigneeDropdown from "./AssigneeDropdown";
 
-import {
-  TASK_STATUSES,
-  TASK_PRIORITIES,
-} from "../constants/taskConstants";
+import { TASK_STATUSES, TASK_PRIORITIES } from "../constants/taskConstants";
 
 function TaskFilters({ filters, setFilters, tasks, sortOrder, onSortChange }) {
   const inputClass =
@@ -26,6 +23,8 @@ function TaskFilters({ filters, setFilters, tasks, sortOrder, onSortChange }) {
       priority: "",
       assignee: "",
     });
+
+    onSortChange("all");
   }
 
   return (
@@ -37,9 +36,7 @@ function TaskFilters({ filters, setFilters, tasks, sortOrder, onSortChange }) {
           </div>
 
           <div className="min-w-0">
-            <h2 className="text-base font-bold text-text">
-              جست‌وجو و فیلترها
-            </h2>
+            <h2 className="text-base font-bold text-text">جست‌وجو و فیلترها</h2>
 
             <p className="mt-1 text-xs text-text-muted">
               وظایف موردنظرت را پیدا کن.
@@ -106,13 +103,13 @@ function TaskFilters({ filters, setFilters, tasks, sortOrder, onSortChange }) {
             >
               <option value="all">همه وضعیت‌ها</option>
 
-              {TASK_STATUSES.filter(
-                (status) => status.value !== "overdue",
-              ).map((status) => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
-                </option>
-              ))}
+              {TASK_STATUSES.filter((status) => status.value !== "overdue").map(
+                (status) => (
+                  <option key={status.value} value={status.value}>
+                    {status.label}
+                  </option>
+                ),
+              )}
             </select>
 
             <ChevronDown
@@ -172,7 +169,7 @@ function TaskFilters({ filters, setFilters, tasks, sortOrder, onSortChange }) {
           />
         </div>
 
-        {/* مرتب‌سازی */}
+        {/* مرتب‌سازی موعد */}
         <div className="min-w-0">
           <label
             htmlFor="task-sort"
@@ -188,8 +185,10 @@ function TaskFilters({ filters, setFilters, tasks, sortOrder, onSortChange }) {
               onChange={(event) => onSortChange(event.target.value)}
               className={selectClass}
             >
+              <option value="all">همه وظایف</option>
               <option value="asc">نزدیک‌ترین موعد</option>
               <option value="desc">دورترین موعد</option>
+              <option value="overdue">موعد گذشته</option>
             </select>
 
             <ChevronDown

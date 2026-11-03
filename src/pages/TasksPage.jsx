@@ -23,7 +23,7 @@ function TasksPage() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState("all");
   const [filters, setFilters] = useState({
     search: "",
     status: "",
@@ -39,7 +39,7 @@ function TasksPage() {
     return sortTasksByDueDate(filteredTasks, sortOrder);
   }, [filteredTasks, sortOrder]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredTasks.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(sortedTasks.length / PAGE_SIZE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
 
   const paginatedTasks = useMemo(() => {
@@ -49,7 +49,7 @@ function TasksPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters]);
+  }, [filters, sortOrder]);
 
   const closeForm = useCallback(() => {
     setIsFormOpen(false);
@@ -154,7 +154,8 @@ function TasksPage() {
       <TaskList
         filters={filters}
         tasks={paginatedTasks}
-        totalCount={filteredTasks.length}
+        totalCount={sortedTasks.length}
+        pageSize={PAGE_SIZE}
         currentPage={safeCurrentPage}
         totalPages={totalPages}
         onPageChange={(page) =>

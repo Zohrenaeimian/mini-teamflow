@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SquarePen, Trash2, ChevronDown, Check } from "lucide-react";
 import {
@@ -13,6 +12,8 @@ import {
   FloatingPortal,
 } from "@floating-ui/react";
 
+import { formatJalaliDate } from "../utils/dateHelpers";
+
 import {
   TASK_STATUSES,
   STATUS_LABELS,
@@ -22,30 +23,6 @@ import {
   UNKNOWN_MEMBER,
   UNKNOWN_PROJECT,
 } from "../constants/taskConstants";
-
-function formatJalaliDate(gregorianDate) {
-  if (!gregorianDate) return "بدون تاریخ";
-
-  const [year, month, day] = gregorianDate.slice(0, 10).split("-").map(Number);
-
-  const date = new Date(Date.UTC(year, month - 1, day));
-
-  if (
-    Number.isNaN(date.getTime()) ||
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== day
-  ) {
-    return "تاریخ نامعتبر";
-  }
-
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "UTC",
-  }).format(date);
-}
 
 const statusOptions = TASK_STATUSES.filter(
   (option) => option.value !== "overdue",

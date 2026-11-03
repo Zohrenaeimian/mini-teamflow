@@ -1,12 +1,11 @@
-
 import { useEffect, useRef, useState } from "react";
 import TaskFormModal from "./TaskFormModal";
 
-import { isValidDate } from "../utils/taskHelpers";
-import {
-  TASK_STATUSES,
-  TASK_PRIORITIES,
-} from "../constants/taskConstants";
+import { isValidDate, formatJalaliInputDate } from "../utils/dateHelpers";
+
+import AssigneeSelect from "./AssigneeSelect";
+
+import { TASK_STATUSES, TASK_PRIORITIES } from "../constants/taskConstants";
 
 const initialFormData = {
   title: "",
@@ -22,33 +21,6 @@ const initialFormData = {
 const selectableStatuses = TASK_STATUSES.filter(
   (status) => status.value !== "overdue",
 );
-
-function formatJalaliInputDate(gregorianDate) {
-  if (!isValidDate(gregorianDate)) {
-    return "";
-  }
-
-  const [year, month, day] = gregorianDate.split("-").map(Number);
-
-  const formatter = new Intl.DateTimeFormat("en-US-u-ca-persian", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "UTC",
-  });
-
-  const parts = formatter.formatToParts(
-    new Date(Date.UTC(year, month - 1, day)),
-  );
-
-  const values = Object.fromEntries(
-    parts
-      .filter((part) => ["year", "month", "day"].includes(part.type))
-      .map((part) => [part.type, part.value]),
-  );
-
-  return `${values.year}/${values.month}/${values.day}`;
-}
 
 function TaskForm({ task = null, onSubmit, onCancel }) {
   const [formData, setFormData] = useState(() => {
@@ -72,6 +44,7 @@ function TaskForm({ task = null, onSubmit, onCancel }) {
   );
 
   const [error, setError] = useState("");
+ 
 
   const dateInputRef = useRef(null);
   const gregorianInputRef = useRef(null);
@@ -118,6 +91,7 @@ function TaskForm({ task = null, onSubmit, onCancel }) {
 
     setError("");
   }
+
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -175,9 +149,7 @@ function TaskForm({ task = null, onSubmit, onCancel }) {
     <TaskFormModal
       title={task ? "ویرایش وظیفه" : "ایجاد وظیفه جدید"}
       description={
-        task
-          ? "اطلاعات وظیفه را ویرایش کنید."
-          : "اطلاعات وظیفه را وارد کنید."
+        task ? "اطلاعات وظیفه را ویرایش کنید." : "اطلاعات وظیفه را وارد کنید."
       }
       onCancel={onCancel}
     >
@@ -235,7 +207,9 @@ function TaskForm({ task = null, onSubmit, onCancel }) {
               onChange={handleChange}
               className={inputClass}
             >
-              <option value="">انتخاب وضعیت</option>
+              <option value="" hidden>
+                انتخاب وضعیت
+              </option>
 
               {selectableStatuses.map((status) => (
                 <option key={status.value} value={status.value}>
@@ -260,7 +234,9 @@ function TaskForm({ task = null, onSubmit, onCancel }) {
               onChange={handleChange}
               className={inputClass}
             >
-              <option value="">انتخاب اولویت</option>
+              <option value="" hidden>
+                انتخاب اولویت
+              </option>
 
               {TASK_PRIORITIES.map((priority) => (
                 <option key={priority.value} value={priority.value}>
@@ -278,13 +254,15 @@ function TaskForm({ task = null, onSubmit, onCancel }) {
               عضو مسئول
             </label>
 
-            <input
-              id="assigneeName"
-              name="assigneeName"
+            <AssigneeSelect
               value={formData.assigneeName}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="نام عضو مسئول"
+              onChange={(assigneeName) => {
+                setFormData((currentData) => ({
+                  ...currentData,
+                  assigneeName,
+                }));
+                setError("");
+              }}
             />
           </div>
 
@@ -328,8 +306,7 @@ function TaskForm({ task = null, onSubmit, onCancel }) {
                 setError("");
               }}
               onBlur={() => {
-                const gregorianDate =
-                  gregorianInputRef.current?.value ?? "";
+                const gregorianDate = gregorianInputRef.current?.value ?? "";
 
                 setFormData((currentData) => ({
                   ...currentData,

@@ -6,46 +6,15 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import {
+  getDaysRemaining,
+  formatJalaliDate,
+} from "../utils/dateHelpers";
+
+import {
   STATUS_LABELS,
   STATUS_SOFT_STYLES,
   PRIORITY_DOT_COLORS,
 } from "../constants/taskConstants";
-
-function getDaysRemaining(dueDate) {
-  if (!dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
-    return null;
-  }
-
-  const [year, month, day] = dueDate.split("-").map(Number);
-  const due = new Date(year, month - 1, day);
-
-  // جلوگیری از محاسبه تاریخ‌های نامعتبر
-  if (
-    due.getFullYear() !== year ||
-    due.getMonth() !== month - 1 ||
-    due.getDate() !== day
-  ) {
-    return null;
-  }
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const difference = due.getTime() - today.getTime();
-
-  return Math.round(difference / (1000 * 60 * 60 * 24));
-}
-
-function formatJalaliDate(dueDate) {
-  const [year, month, day] = dueDate.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-}
 
 function UpcomingTasks({ tasks = [] }) {
   const navigate = useNavigate();

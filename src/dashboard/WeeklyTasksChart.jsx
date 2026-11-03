@@ -1,6 +1,8 @@
+
 import { BarChart3 } from "lucide-react";
 
 import { isOverdue } from "../utils/taskHelpers";
+import { getCurrentWeekDates } from "../utils/dateHelpers";
 
 import {
   BarChart,
@@ -13,42 +15,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { TASK_STATUSES, STATUS_CHART_COLORS } from "../constants/taskConstants";
-
-const WEEK_DAYS = [
-  "شنبه",
-  "یکشنبه",
-  "دوشنبه",
-  "سه‌شنبه",
-  "چهارشنبه",
-  "پنجشنبه",
-  "جمعه",
-];
-
-function getCurrentWeekDates() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // پیدا کردن شنبه هفته جاری
-  const daysSinceSaturday = (today.getDay() + 1) % 7;
-
-  const saturday = new Date(today);
-  saturday.setDate(today.getDate() - daysSinceSaturday);
-
-  return WEEK_DAYS.map((name, index) => {
-    const date = new Date(saturday);
-    date.setDate(saturday.getDate() + index);
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return {
-      name,
-      dateKey: `${year}-${month}-${day}`,
-    };
-  });
-}
+import {
+  TASK_STATUSES,
+  STATUS_CHART_COLORS,
+} from "../constants/taskConstants";
 
 function WeeklyTasksChart({ tasks = [] }) {
   const weekDates = getCurrentWeekDates();
@@ -97,7 +67,11 @@ function WeeklyTasksChart({ tasks = [] }) {
 
       {!hasData ? (
         <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface-muted/40 px-4 py-5 text-center">
-          <BarChart3 size={25} strokeWidth={1.6} className="text-text-muted" />
+          <BarChart3
+            size={25}
+            strokeWidth={1.6}
+            className="text-text-muted"
+          />
 
           <p className="mt-2 text-sm font-medium text-text">
             وظیفه‌ای برای نمایش در این هفته وجود ندارد

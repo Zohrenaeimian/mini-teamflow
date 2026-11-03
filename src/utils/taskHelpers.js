@@ -1,25 +1,9 @@
 import { PRIORITY_VALUES, STATUS_VALUES } from "../constants/taskConstants";
-
-export function isValidDate(dateString) {
-  if (typeof dateString !== "string") {
-    return false;
-  }
-
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-
-  if (!datePattern.test(dateString)) {
-    return false;
-  }
-
-  const [year, month, day] = dateString.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
-  return (
-    date.getFullYear() === year &&
-    date.getMonth() === month - 1 &&
-    date.getDate() === day
-  );
-}
+import {
+  isValidDate,
+  getTodayString,
+  addDaysToDateString,
+} from "./dateHelpers";
 
 export function isOverdue(task) {
   if (!task || !isValidDate(task.dueDate)) {
@@ -30,12 +14,7 @@ export function isOverdue(task) {
     return false;
   }
 
-  const now = new Date();
-  const today = [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0"),
-  ].join("-");
+  const today = getTodayString();
 
   return task.dueDate < today;
 }
@@ -81,23 +60,57 @@ export function normalizeTask(task) {
 }
 
 export function filterTasks(tasks, filters = {}) {
-  const { search = "", status = "", priority = "", assignee = "" } = filters;
+  const {
+    search = "",
+    status = "",
+    priority = "",
+    assignee = "",
+    dueDateStatus = "",
+  } = filters;
 
   const searchText = search.trim().toLowerCase();
 
   return tasks.filter((task) => {
     const title = typeof task.title === "string" ? task.title : "";
+
     const matchesSearch = title.toLowerCase().includes(searchText);
     const matchesStatus = !status || task.status === status;
     const matchesPriority = !priority || task.priority === priority;
     const matchesAssignee = !assignee || task.assigneeName === assignee;
 
-    return matchesSearch && matchesStatus && matchesPriority && matchesAssignee;
+    const matchesDueDateStatus =
+      !dueDateStatus || (dueDateStatus === "overdue" && isOverdue(task));
+
+    return (
+      matchesSearch &&
+      matchesStatus &&
+      matchesPriority &&
+      matchesAssignee &&
+      matchesDueDateStatus
+    );
   });
 }
 
 export function sortTasksByDueDate(tasks, order = "asc") {
-  return [...tasks].sort((a, b) => {
+  const today = getTodayString();
+
+  if (order === "all") {
+    return [...tasks];
+  }
+  // نمایش فقط وظایف عقب‌افتاده
+  if (order === "overdue") {
+    return tasks
+      .filter((task) => isOverdue(task))
+      .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  }
+
+  // در مرتب‌سازی عادی، موعدهای گذشته نمایش داده نمی‌شوند
+  const upcomingTasks = tasks.filter(
+    (task) =>
+      !isOverdue(task) && (!isValidDate(task.dueDate) || task.dueDate >= today),
+  );
+
+  return [...upcomingTasks].sort((a, b) => {
     const aIsValid = isValidDate(a.dueDate);
     const bIsValid = isValidDate(b.dueDate);
 
@@ -105,23 +118,11 @@ export function sortTasksByDueDate(tasks, order = "asc") {
     if (!aIsValid) return 1;
     if (!bIsValid) return -1;
 
-    const aTime = new Date(
-      Number(a.dueDate.slice(0, 4)),
-      Number(a.dueDate.slice(5, 7)) - 1,
-      Number(a.dueDate.slice(8, 10)),
-    ).getTime();
-
-    const bTime = new Date(
-      Number(b.dueDate.slice(0, 4)),
-      Number(b.dueDate.slice(5, 7)) - 1,
-      Number(b.dueDate.slice(8, 10)),
-    ).getTime();
-
     if (order === "desc") {
-      return bTime - aTime;
+      return b.dueDate.localeCompare(a.dueDate);
     }
 
-    return aTime - bTime;
+    return a.dueDate.localeCompare(b.dueDate);
   });
 }
 
@@ -165,29 +166,15 @@ export function getTaskStatistics(tasks = []) {
 export function getUpcomingTasks(tasks = [], limit = 5) {
   const list = Array.isArray(tasks) ? tasks : [];
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const lastDate = new Date(today);
-  lastDate.setDate(lastDate.getDate() + 4);
-
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
-
-  const todayString = formatDate(today);
-  const lastDateString = formatDate(lastDate);
+  const today = getTodayString();
+  const lastDate = addDaysToDateString(today, 4);
 
   const upcoming = list.filter(
     (task) =>
       task.status !== "done" &&
       isValidDate(task.dueDate) &&
-      task.dueDate >= todayString &&
-      task.dueDate <= lastDateString,
+      task.dueDate >= today &&
+      task.dueDate <= lastDate,
   );
 
   return sortTasksByDueDate(upcoming, "asc").slice(0, limit);
@@ -198,6 +185,7 @@ export function hasActiveFilters(filters = {}) {
     filters.search?.trim() ||
     filters.status ||
     filters.priority ||
-    filters.assignee,
+    filters.assignee ||
+    filters.dueDateStatus,
   );
 }
